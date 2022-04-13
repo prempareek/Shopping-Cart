@@ -16,21 +16,15 @@ router.put('/user/:userId/profile', mw.authentication, mw.authorisation, UserCon
 
 router.post('/products', ProductController.createProduct);
 
+router.get("/products", ProductController.getProductbyQuery);
+
 router.get("/products/:productId", ProductController.getProductsById);
 
 router.post("/products/:productId", ProductController.updateProduct);
 
 router.delete("/products/:productId", ProductController.deleteProduct);
 
-// router.put("/books/:bookId", mw.authentication, mw.authorisation, BookController.updateBooks);
 
-// router.delete("/books/:bookId", mw.authentication, mw.authorisation, BookController.deleteBooks);
-
-// router.post("/books/:bookId/review", ReviewController.createReview);
-
-// router.put("/books/:bookId/review/:reviewId", ReviewController.updateReview);
-
-// router.delete("/books/:bookId/review/:reviewId", ReviewController.deleteReview);
 
 
 

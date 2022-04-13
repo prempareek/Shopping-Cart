@@ -57,29 +57,89 @@ const createProduct = async (req, res) => {
 }
 
 
-//////////////////////////////////////////////////filter wala baki///////////////////////////////////////////////////////
+const getProductbyQuery = async function (req, res) {
+    try {
+
+        // let size = req.query.size
+        // let name = req.query.name
+        // let priceGreaterThan = req.query.priceGreaterThan
+        // let priceLessThan = req.query.priceLessThan
+
+        let { size, name, priceGreaterThan, priceLessThan, priceSort } = req.query
 
 
+        let filters = { isDeleted: false }
+
+        if (size != null) {
+            if (!validator.validForEnum(size)) {
+                return res.status(400).send({ status: false, msg: 'No Such Size Exist in our Filters ... Select from ["S", "XS", "M", "X", "L", "XXL", "XL"]' })
+            }
+            filters["availableSizes"] = size
+        }
+
+        let arr = []
+
+        if (name != null) {
+
+            const random = await productModel.find({ isDeleted: false }).select({ title: 1, _id: 0 })
+            for (let i = 0; i < random.length; i++) {
+                var checkTitle = random[i].title
+
+                let check = checkTitle.includes(name)
+                if (check) {
+                    arr.push(random[i].title)
+                }
+
+            }
+            filters["title"] = arr
+
+        }
+        if (priceGreaterThan != null && priceLessThan == null) {
+            filters["price"] = { $gt: priceGreaterThan }
+        }
 
 
+        if (priceGreaterThan == null && priceLessThan != null) {
+            filters["price"] = { $lt: priceLessThan }
+        }
+
+        if (priceGreaterThan != null && priceLessThan != null) {
+            filters["price"] = { $gte: priceGreaterThan, $lte: priceLessThan }
+        }
+
+        if (priceSort != null) {
+            if (priceSort == 1) {
+                const products = await productModel.find(filters).sort({ price: 1 })
+                if (products.length == 0) {
+                    return res.status(404).send({ status: false, message: "No data found that matches your search" })
+                }
+                return res.status(200).send({ status: true, message: "Results",count: products.length, data: products })
+            }
+
+            if (priceSort == -1) {
+                const products = await productModel.find(filters).sort({ price: -1 })
+                if (products.length == 0) {
+                    return res.status(404).send({ status: false, message: "No data found that matches your search" })
+                }
+                return res.status(200).send({ status: true, message: "Results", count: products.length, data: products })
+            }
+
+        }
+
+        const products = await productModel.find(filters)
+        if (products.length == 0) {
+            return res.status(404).send({ status: false, message: "No data found that matches your search" })
+        }
+        return res.status(200).send({ status: true, message: "Results",count: products.length, data: products })
 
 
+    }
+    catch (error) {
+        console.log(error)
+        return res.status(500).send({ status: false, message: error.message })
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -182,8 +242,8 @@ const updateProduct = async function (req, res) {
 }
 
 
-const deleteProduct = async function(req,res){
-    try{
+const deleteProduct = async function (req, res) {
+    try {
         let productId = req.params.productId
         if (!(validator.isValidObjectId(productId))) {
             return res.status(400).send({ status: false, message: "invalid productId" })
@@ -197,8 +257,8 @@ const deleteProduct = async function(req,res){
         }
         let data = { isDeleted: true, deletedAt: Date.now() }
 
-        const deleteData = await productModel.findOneAndUpdate({ _id: productId, isDeleted: false }, { $set: data }, { new: true }).select({__v:0})
-        return res.status(200).send({ status: true, message: "delete data successfully", data:deleteData })
+        const deleteData = await productModel.findOneAndUpdate({ _id: productId, isDeleted: false }, { $set: data }, { new: true }).select({ __v: 0 })
+        return res.status(200).send({ status: true, message: "delete data successfully", data: deleteData })
 
     }
     catch (error) {
@@ -216,6 +276,7 @@ const deleteProduct = async function(req,res){
 
 
 module.exports.createProduct = createProduct;
+module.exports.getProductbyQuery = getProductbyQuery;
 module.exports.getProductsById = getProductsById;
 module.exports.updateProduct = updateProduct;
 module.exports.deleteProduct = deleteProduct;
