@@ -10,15 +10,41 @@ const isRightFormatemail = function (email) {
 }
 
 const isRightFormatmobile = function (phone) {
-    return /^([+]\d{2})?\d{10}$/.test(phone);
+    return /^\+?([9]{1})\)?([1]{1})\)?([6-9]{1})\)?[-. ]?([0-9]{9})$/.test(phone);
 }
 
+const isValidObjectId = function (objectId) {
+    return /^[0-9a-fA-F]{24}$/.test(objectId)
+}
 
+const isRightFormatprice = function (price) {
+    return /^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)$/.test(price);
+}
 
+const isValidArray = function (object){
+if (typeof (object) === "object") {
+    object = object.filter(x => x.trim())
+    if (object.length == 0) {
+        return false;
+    }
+    else {return true;}
+    }
+  }
 
-
-
+  const validForEnum = function (value) {
+    let enumValue = ["S", "XS", "M", "X", "L", "XXL", "XL"]
+    for (let x of value) {
+        if (enumValue.includes(x) == false) {
+            return false
+        }
+    }
+    return true;
+}
 
 module.exports.isValid = isValid;
 module.exports.isRightFormatemail = isRightFormatemail;
 module.exports.isRightFormatmobile = isRightFormatmobile;
+module.exports.isValidObjectId = isValidObjectId;
+module.exports.isRightFormatprice = isRightFormatprice;
+module.exports.isValidArray = isValidArray;
+module.exports.validForEnum = validForEnum;
