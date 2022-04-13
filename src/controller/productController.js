@@ -60,10 +60,6 @@ const createProduct = async (req, res) => {
 const getProductbyQuery = async function (req, res) {
     try {
 
-        // let size = req.query.size
-        // let name = req.query.name
-        // let priceGreaterThan = req.query.priceGreaterThan
-        // let priceLessThan = req.query.priceLessThan
 
         let { size, name, priceGreaterThan, priceLessThan, priceSort } = req.query
 
