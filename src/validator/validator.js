@@ -41,6 +41,14 @@ if (typeof (object) === "object") {
     return true;
 }
 
+const isValidStatus = function (value) {
+    let enumValue = ["pending", "completed", "cancelled", "Pending", "Completed", "Cancelled"]
+    for (let i=0 ; i<enumValue.length ; i++) {
+        if (value == enumValue[i])  return true
+    }
+    return false;
+}
+
 module.exports.isValid = isValid;
 module.exports.isRightFormatemail = isRightFormatemail;
 module.exports.isRightFormatmobile = isRightFormatmobile;
@@ -48,3 +56,4 @@ module.exports.isValidObjectId = isValidObjectId;
 module.exports.isRightFormatprice = isRightFormatprice;
 module.exports.isValidArray = isValidArray;
 module.exports.validForEnum = validForEnum;
+module.exports.isValidStatus = isValidStatus;

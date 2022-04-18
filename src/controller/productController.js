@@ -9,7 +9,7 @@ const createProduct = async (req, res) => {
         if (Object.keys(data) == 0) { return res.status(400).send({ status: false, message: 'No data provided' }) }
 
         let files = req.files;
-        if (files.length == 0) { return res.status(400).send({ status: false, message: "Please provide a profile image" }) }
+        if (files.length == 0) { return res.status(400).send({ status: false, message: "Please provide a product image" }) }
 
         //validations
 
@@ -28,7 +28,7 @@ const createProduct = async (req, res) => {
 
         if (data.currencyId.trim() !== "INR") { return res.status(400).send({ status: false, message: "Please provide Indian Currency Id" }) }
 
-        if (!(validator.isValid(data.currencyFormat))) { return res.status(400).send({ status: false, message: "Price is required" }) }
+        if (!(validator.isValid(data.currencyFormat))) { return res.status(400).send({ status: false, message: "Currency Format is required" }) }
 
         if (data.currencyFormat.trim() !== "₹") { return res.status(400).send({ status: false, message: "Please provide right format for currency" }) }
 
@@ -76,20 +76,10 @@ const getProductbyQuery = async function (req, res) {
         let arr = []
 
         if (name != null) {
-
-            const random = await productModel.find({ isDeleted: false }).select({ title: 1, _id: 0 })
-            for (let i = 0; i < random.length; i++) {
-                var checkTitle = random[i].title
-
-                let check = checkTitle.includes(name)
-                if (check) {
-                    arr.push(random[i].title)
-                }
-
-            }
-            filters["title"] = arr
-
+            if (!validator.isValid(name)) return res.status(400).send({ status: false, message: "Please enter Product name" })
+            filters['title'] = { $regex: `.*${name.trim()}.*` }
         }
+
         if (priceGreaterThan != null && priceLessThan == null) {
             filters["price"] = { $gt: priceGreaterThan }
         }
@@ -254,7 +244,7 @@ const deleteProduct = async function (req, res) {
         let data = { isDeleted: true, deletedAt: Date.now() }
 
         const deleteData = await productModel.findOneAndUpdate({ _id: productId, isDeleted: false }, { $set: data }, { new: true }).select({ __v: 0 })
-        return res.status(200).send({ status: true, message: "delete data successfully", data: deleteData })
+        return res.status(200).send({ status: true, message: "deleted data successfully", data: deleteData })
 
     }
     catch (error) {
