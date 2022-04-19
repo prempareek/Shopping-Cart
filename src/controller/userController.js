@@ -25,31 +25,38 @@ const createUser = async function (req, res) {
         if (!(validator.isRightFormatemail(data.email))) { return res.status(400).send({ status: false, message: "Please provide a valid email" }) }
 
         let isUniqueEMAIL = await userModel.findOne({ email: data.email })
-        if (isUniqueEMAIL) { return res.status(400).send({ status: false, message: 'User already exist with this email. Login instead ?' }) }
+        if (isUniqueEMAIL) { return res.status(400).send({ status: false, message: `User already exist with this ${data.email}. Login instead ?` }) }
 
         if (!(validator.isValid(data.phone))) { return res.status(400).send({ status: false, message: "Phone number is required" }) }
 
-        if (!(validator.isRightFormatmobile(data.phone))) { return res.status(400).send({ status: false, message: "Please provide a valid phone number" }) }
+        if (!(validator.isRightFormatmobile(data.phone))) { return res.status(400).send({ status: false, message: "Please provide a valid Indian phone number with country code (+91..)" }) }
 
         let isUniquePhone = await userModel.findOne({ phone: data.phone })
-        if (isUniquePhone) { return res.status(400).send({ status: false, message: 'User already exist with this phone number.' }) }
+        if (isUniquePhone) { return res.status(400).send({ status: false, message: `User already exist with this ${data.phone}.` }) }
 
         if (!(validator.isValid(data.password))) { return res.status(400).send({ status: false, message: "Password is required" }) }
 
         if (data.password.trim().length < 8 || data.password.trim().length > 15) { return res.status(400).send({ status: false, message: 'Password should be of minimum 8 characters & maximum 15 characters' }) }
 
+        if (data.address == null) { return res.status(400).send({ status: false, message: "Please provide your address"})}
+
         let address = JSON.parse(data.address)
+
         if (!(validator.isValid(address.shipping.street))) { return res.status(400).send({ status: true, message: " Street address is required" }) }
 
         if (!(validator.isValid(address.shipping.city))) { return res.status(400).send({ status: true, message: "  City is required" }) }
 
         if (!(validator.isValid(address.shipping.pincode))) { return res.status(400).send({ status: true, message: " Pincode is required" }) }
 
+        if(!(validator.isNumber(address.shipping.pincode))) { return res.status(400).send({ status: false, message: "Please provide pincode in 6 digit number"})}
+
         if (!(validator.isValid(address.billing.street))) { return res.status(400).send({ status: true, message: " Street billing address is required" }) }
 
         if (!(validator.isValid(address.billing.city))) { return res.status(400).send({ status: true, message: " City billing address is required" }) }
 
         if (!(validator.isValid(address.billing.pincode))) { return res.status(400).send({ status: true, message: " Billing pincode is required" }) }
+
+        if(!(validator.isNumber(address.billing.pincode))) { return res.status(400).send({ status: false, message: "Please provide pincode in 6 digit number"})}
 
         //encrypting password
         const saltRounds = 10;
@@ -106,7 +113,7 @@ const login = async function (req, res) {
 
 
         // res.setHeader("x-api-key", "token");
-        return res.status(200).send({ status: true, message: "You are successfully logged in", data: userId, token })
+        return res.status(200).send({ status: true, message: "You are successfully logged in", data:{userId: userId, token:token} })
 
 
 
@@ -170,14 +177,12 @@ const updateUser = async function (req, res) {
             dataToUpdate['phone'] = phone.trim()
         }
         if (validator.isValid(password)) {
-            if (password.trim().length > 8 || password.trim().length < 15) {
-                const saltRounds = 10;
+            if (password.trim().length < 8 || password.trim().length > 15) {
+                return res.status(400).send({ status: false, message: `${password} is an invalid password it should be in between 8 to 15 characters` })
+            } 
+            const saltRounds = 10;
                 let hash = await bcrypt.hash(password, saltRounds);
                 dataToUpdate['password'] = hash;
-            } else {
-                return res.status(400).send({ status: false, message: `${password} is an invalid password it should be in between 8 to 15 characters` })
-
-            }
         }
 
         if (address) {
@@ -196,8 +201,8 @@ const updateUser = async function (req, res) {
                     dataToUpdate['address.shipping.city'] = address.shipping.city
                 }
                 if (address.shipping.pincode != null) {
-                    if (typeof address.shipping.pincode !== 'number') {
-                        return res.status(400).send({ status: false, message: ' Please provide a valid pincode' })
+                    if (!(validator.isNumber(address.shipping.pincode))) {
+                        return res.status(400).send({ status: false, message: ' Please provide a valid pincode in 6 digits' })
                     }
                     dataToUpdate['address.shipping.pincode'] = address.shipping.pincode
                 }
@@ -217,8 +222,8 @@ const updateUser = async function (req, res) {
                     dataToUpdate['address.billing.city'] = address.billing.city
                 }
                 if (address.billing.pincode != null) {
-                    if (typeof address.billing.pincode !== 'number') {
-                        return res.status(400).send({ status: false, message: ' Please provide a valid pincode' })
+                    if (!(validator.isNumber(address.billing.pincode))) {
+                        return res.status(400).send({ status: false, message: ' Please provide a valid pincode in 6 digits' })
                     }
                     dataToUpdate['address.billing.pincode'] = address.billing.pincode
                 }
@@ -232,7 +237,7 @@ const updateUser = async function (req, res) {
             dataToUpdate['profileImage'] = uploadedFileURL;
         }
 
-        const userdetails = await userModel.findOneAndUpdate({ userId }, dataToUpdate, { new: true })
+        const userdetails = await userModel.findOneAndUpdate({ _id: userId }, dataToUpdate, { new: true })
         return res.status(200).send({ status: true, message: "updated user Profile", data: userdetails })
 
 

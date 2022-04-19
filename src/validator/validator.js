@@ -1,8 +1,13 @@
+const mongoose = require("mongoose");
+
+
 const isValid = function (value) {
     if (typeof (value) === undefined || typeof (value) === null) { return false }
     if (typeof (value) === "string" && value.trim().length > 0) { return true }
     if (typeof (value) === "number" && value.toString().trim().length > 0) { return true }
     if (typeof (value) === "object" && value.length > 0) { return true }
+    if (typeof (value) === null ) { return false}
+    
 }
 
 const isRightFormatemail = function (email) {
@@ -14,11 +19,23 @@ const isRightFormatmobile = function (phone) {
 }
 
 const isValidObjectId = function (objectId) {
-    return /^[0-9a-fA-F]{24}$/.test(objectId)
-}
+    
+        return mongoose.Types.ObjectId.isValid(objectId)
+    }
+    
 
 const isRightFormatprice = function (price) {
     return /^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)$/.test(price);
+}
+
+const isNumber =function (value) {
+    if(typeof (value) == NaN){
+        return false
+    }
+    if (value.toString().trim().length != 6) {
+        return false
+    }
+    else {return true}
 }
 
 const isValidArray = function (object){
@@ -54,6 +71,7 @@ module.exports.isRightFormatemail = isRightFormatemail;
 module.exports.isRightFormatmobile = isRightFormatmobile;
 module.exports.isValidObjectId = isValidObjectId;
 module.exports.isRightFormatprice = isRightFormatprice;
+module.exports.isNumber = isNumber;
 module.exports.isValidArray = isValidArray;
 module.exports.validForEnum = validForEnum;
 module.exports.isValidStatus = isValidStatus;

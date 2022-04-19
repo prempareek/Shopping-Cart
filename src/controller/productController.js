@@ -90,6 +90,7 @@ const getProductbyQuery = async function (req, res) {
         }
 
         if (priceGreaterThan != null && priceLessThan != null) {
+            if (priceGreaterThan > priceLessThan){return res.status(400).send({status: false, message:"Input error. Price greater than filter can not be less than price less than filter"})}
             filters["price"] = { $gte: priceGreaterThan, $lte: priceLessThan }
         }
 
@@ -132,6 +133,7 @@ const getProductbyQuery = async function (req, res) {
 const getProductsById = async function (req, res) {
     try {
         let productId = req.params.productId
+        if(Object.keys(productId)== 0){ return res.status(400).send({status: false, message: "please provide product id"})}
         if (!(validator.isValidObjectId(productId))) {
             return res.status(400).send({ status: false, msg: "productId is not valid" })
         }
@@ -151,6 +153,9 @@ const getProductsById = async function (req, res) {
 const updateProduct = async function (req, res) {
     try {
         let productId = req.params.productId
+
+        if(Object.keys(productId)== 0){ return res.status(400).send({status: false, message: "please provide product id"})}
+
         if (!(validator.isValid(productId))) {
             return res.status(400).send({ status: false, message: "Product Id is required" })
         }
@@ -164,52 +169,80 @@ const updateProduct = async function (req, res) {
             return res.status(400).send({ status: false, message: "enter data to update" })
         }
 
-        if (validator.isValid(updateData.title)) {
+
+        if (updateData.title != null){
+        if (!(validator.isValid(updateData.title))) {
+            return res.status(400).send({status: false, message: "Please provide title to update"})
+        }
             let findTitle = await productModel.findOne({ title: updateData.title })
             if (findTitle) {
                 return res.status(400).send({ status: false, message: " Title already in use. Enter a unique title" })
             }
             objectData.title = updateData.title
         }
-        if (validator.isValid(updateData.description)) {
+    
+        if (updateData.description != null){
+        if (!(validator.isValid(updateData.description))) {
+            return res.status(400).send({status: false, message: "Please provide description to update"})}
             objectData.description = updateData.description
         }
-        if (validator.isValid(updateData.price)) {
+
+        if (updateData.price != null){
+        if (!(validator.isValid(updateData.price))) {
+            return res.status(400).send({status: false, message: "Please provide price to update"})}
             if (!(validator.isRightFormatprice(updateData.price))) {
                 return res.status(400).send({ status: false, message: `${updateData.price} is not a valid price. Please provide input in numbers.` })
             }
 
             objectData.price = updateData.price
         }
-        if (validator.isValid(updateData.currencyId)) {
+
+        if (updateData.currencyId != null){
+        if (!(validator.isValid(updateData.currencyId))) {
+            return res.status(400).send({status: false, message: "Please provide Currency Id to update"})}
             if (updateData.currencyId.trim() !== "INR") {
                 return res.status(400).send({ status: false, message: "Please provide Indian Currency Id" })
             }
             objectData.currencyId = updateData.currencyId
         }
-        if (validator.isValid(updateData.currencyFormat)) {
+
+        if (updateData.currencyFormat != null){
+        if (!(validator.isValid(updateData.currencyFormat))) {
+            return res.status(400).send({status: false, message: "Please provide Currency Format to update"})}
             if (data.currencyFormat.trim() !== "₹") {
                 return res.status(400).send({ status: false, message: "Please provide right format for currency" })
             }
             objectData.currencyFormat = updateData.currencyFormat
         }
+        
         let file = req.files
+        
         if (file.length > 0) {
             let uploadFileUrl = await uploadFile(file[0])
             objectData.productImage = uploadFileUrl
         }
-
-        if (validator.isValid(updateData.availableSizes)) {
+        
+        if (updateData.availableSizes != null){
+        if (!(validator.isValid(updateData.availableSizes))) {
+            return res.status(400).send({status: false, message: "Please provide available size to update"})}
             updateData.availableSizes = JSON.parse(updateData.availableSizes)
-            if (!(validator.validForEnum(updateData.availableSizes))) {
-                return res.status(400).send({ status: false, message: "Please provide a valid size" })
-            }
+
             if (!(validator.isValidArray(updateData.availableSizes))) {
                 return res.status(400).send({ status: false, message: "Please provide available size for your product" })
             }
 
+            if (!(validator.validForEnum(updateData.availableSizes))) {
+                return res.status(400).send({ status: false, message: "Please provide a valid size" })
+            }
+            
+            objectData.availableSizes = updateData.availableSizes
+
         }
-        if (validator.isValid(updateData.installments)) {
+
+        if (updateData.installments != null){
+        if (!(validator.isValid(updateData.installments))) {
+            return res.status(400).send({ status: false, message: "Please provide installment to update" })
+            }
             objectData.installments = updateData.installments
         }
 

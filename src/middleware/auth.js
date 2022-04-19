@@ -12,7 +12,7 @@ const authentication = async function (req, res, next) {
         if (!token) return res.status(400).send({ status: false, msg: "login is required" })
 
 
-        let decodedtoken = jwt.verify(token, "Secret-Key")
+        let decodedtoken = jwt.verify(token, "Secret-Key", { ignoreExpiration: true })
         if (!decodedtoken) return res.status(401).send({ status: false, msg: "token is invalid" })
         
 
@@ -39,7 +39,8 @@ const authorisation = async function (req, res, next) {
             token = token.slice(7, token.length)
         }
 
-        let decodedtoken = jwt.verify(token, "Secret-Key")
+        let decodedtoken = jwt.verify(token, "Secret-Key", 
+        )
 
 
         let toBeupdateduserId = req.params.userId
