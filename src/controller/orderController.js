@@ -35,7 +35,7 @@ const createOrder = async (req, res) => {
 
             if (!items[i].quantity > 0) return res.status(400).send({ status: false, message: `Please provide min 1 quantity at position ${i + 1}` })
 
-            const updateProductDetails = await productModel.findOneAndUpdate({ _id: items[i].productId }, { $inc: { installments: installments - items[i].quantity } })
+            const updateProductDetails = await productModel.findOneAndUpdate({ _id: items[i].productId }, { $inc: { installments:  - items[i].quantity } })
 
         }
 
@@ -105,7 +105,7 @@ const updateOrder = async (req, res) => {
 
             const items = orderMatch.items
             for (let i = 0; i < items.length; i++) {
-                const updateProductDetails = await productModel.findOneAndUpdate({ _id: items[i].productId }, { $inc: { installments: installments + items[i].quantity } })
+                const updateProductDetails = await productModel.findOneAndUpdate({ _id: items[i].productId }, { $inc: { installments:  items[i].quantity } })
             }
 
 
