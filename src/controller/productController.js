@@ -40,6 +40,10 @@ const createProduct = async (req, res) => {
 
         if (!(validator.validForEnum(data.availableSizes))) { return res.status(400).send({ status: false, message: "Please provide an appropriate size" }) }
 
+        if (!(validator.isValid(data.installments))) { return res.status(400).send({ status: false, message: 'Please provide installments for your product' }) }
+
+        if(!(validator.isNum(data.installments))) { return res.status(400).send({ status: false, message: 'Installments for your product can only be in numbers' }) }
+
         const uploadedFileURL = await aws.uploadFile(files[0])
 
         data.productImage = uploadedFileURL;

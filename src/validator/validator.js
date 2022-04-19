@@ -60,6 +60,13 @@ const isValidStatus = function (value) {
     return false;
 }
 
+const isNum = function (value){
+    if (typeof (value) == "number"){
+        return true
+    }
+    else{return false}
+}
+
 module.exports.isValid = isValid;
 module.exports.isRightFormatemail = isRightFormatemail;
 module.exports.isRightFormatmobile = isRightFormatmobile;
@@ -69,3 +76,4 @@ module.exports.isNumber = isNumber;
 module.exports.isValidArray = isValidArray;
 module.exports.validForEnum = validForEnum;
 module.exports.isValidStatus = isValidStatus;
+module.exports.isNum = isNum;
