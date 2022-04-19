@@ -16,11 +16,12 @@ const authentication = async function (req, res, next) {
         if (!decodedtoken) return res.status(401).send({ status: false, msg: "token is invalid" })
         
 
-        let time = Math.floor(new Date().getTime()/1000.0)
-        
+
+        let time = Math.floor(Date.now() / 1000)
         if (decodedtoken.exp < time) {
             return res.status(401).send({ status: false, message: "token expired, please login again" });
         }
+
 
         next()
     }
@@ -40,11 +41,6 @@ const authorisation = async function (req, res, next) {
 
         let decodedtoken = jwt.verify(token, "Secret-Key")
 
-        let time = Math.floor(new Date().getTime()/1000.0)
-        console.log(time)
-        if (decodedtoken.exp < time) {
-            return res.status(401).send({ status: false, message: "token expired, please login again" });
-        }
 
         let toBeupdateduserId = req.params.userId
 
