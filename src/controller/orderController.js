@@ -93,7 +93,7 @@ const updateOrder = async (req, res) => {
             if (!validator.isValidStatus(status)) return res.status(400).send({ status: false, message: "Please Provide Valid Order Status" })
             finalUpdates["status"] = status
         }
-        if (status == "cancelled" || "Cancelled") {
+        if (status == "cancelled" || status == "Cancelled") {
 
             if (orderMatch.cancellable != true) {
 

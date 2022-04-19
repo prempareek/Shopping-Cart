@@ -28,14 +28,8 @@ const isRightFormatprice = function (price) {
     return /^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)$/.test(price);
 }
 
-const isNumber =function (value) {
-    if(typeof (value) == NaN){
-        return false
-    }
-    if (value.toString().trim().length != 6) {
-        return false
-    }
-    else {return true}
+const isNumber =function (pincode) {
+    if ( /^\+?([1-9]{1})\)?([0-9]{5})$/.test(pincode)) return true
 }
 
 const isValidArray = function (object){
