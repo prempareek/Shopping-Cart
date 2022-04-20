@@ -109,9 +109,15 @@ const updateCart = async function (req, res) {
         
         if (Object.keys(userId) == 0) {return res.status(400).send({status: false, message: "Please provide user id in path params"})}
 
+        if (!validator.isValidObjectId(userId)) {return res.status(400).send({status: false, message: "Please provide a valid User Id"})}
+
         if (!validator.isValid(cartId)) {return res.status(400).send({status: true, message: "Please provide cart id in body"})}
 
+        if (!validator.isValidObjectId(cartId)) {return res.status(400).send({status: false, message: "Please provide a valid Cart Id"})}
+
         if (!validator.isValid(productId)) {return res.status(400).send({status: true, message: "Please provide cart id in body"})}
+
+        if (!validator.isValidObjectId(productId)) {return res.status(400).send({status: false, message: "Please provide a valid Product Id"})}
 
         if (!validator.isValid(removeProduct)) {return res.status(400).send({status: true, message: "Please provide cart id in body"})}
 
