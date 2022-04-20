@@ -5,17 +5,17 @@ const validator = require("../validator/validator")
 const authentication = async function (req, res, next) {
     try {
         let token = req.headers['authorization'];
+
+        if (!token) return res.status(400).send({ status: false, msg: "login is required" })
+
         if (token.startsWith('Bearer')) {
             token = token.slice(7, token.length)
         }
-
-        if (!token) return res.status(400).send({ status: false, msg: "login is required" })
 
 
         let decodedtoken = jwt.verify(token, "Secret-Key", { ignoreExpiration: true })
         if (!decodedtoken) return res.status(401).send({ status: false, msg: "token is invalid" })
         
-
 
         let time = Math.floor(Date.now() / 1000)
         if (decodedtoken.exp < time) {
@@ -35,6 +35,7 @@ const authentication = async function (req, res, next) {
 const authorisation = async function (req, res, next) {
     try {
         let token = req.headers['authorization'];
+        
         if (token.startsWith('Bearer')) {
             token = token.slice(7, token.length)
         }
